@@ -6,6 +6,8 @@ esp32:
 esphome:
   name: air-quality-clock
   
+# Stupid esphome i2c keeps returning busy, so this modification 
+# retries Wire.endTransmission 5 times before failing.
 external_components:
   - source: custom_components
     components: [ i2c ]
@@ -49,9 +51,11 @@ spi:
   mosi_pin: GPIO13
   
 font:
-  # gfonts://family[@weight]
-  - file: "gfonts://Roboto"
-    id: roboto
+  - file: "pixelmix.ttf"
+    id: pixelmix
+    size: 8
+  - file: "pixelmix_bold.ttf"
+    id: pixelmix_bold
     size: 12
 
 sensor:  
@@ -99,7 +103,7 @@ display:
     dc_pin: GPIO25
     contrast: 0x4f
     lambda: |-
-      it.strftime(0, 0, id(roboto), "%I:%M:%S %p", id(sntp_time).now());
-      it.printf(0, 16, id(roboto), "CO2: %.0fppm", id(co2).state);
-      it.printf(0, 32, id(roboto), "Temperature: %.0f°C", id(bme280_temp).state);
-      it.printf(0, 48, id(roboto), "Humidity: %.0f%%rh", id(bme280_hum).state);
+      it.strftime(12, 4, id(pixelmix_bold), "%H:%M:%S", id(sntp_time).now());
+      it.printf(12, 20, id(pixelmix), "CO2: %.0fppm", id(co2).state);
+      it.printf(16, 28, id(pixelmix), "Temp: %.0f°C", id(bme280_temp).state);
+      it.printf(20, 36, id(pixelmix), "Humi: %.0f%%", id(bme280_hum).state);
