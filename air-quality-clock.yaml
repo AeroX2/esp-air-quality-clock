@@ -1,0 +1,105 @@
+esp32:
+  board: lolin32_lite
+  framework:
+    type: arduino
+
+esphome:
+  name: air-quality-clock
+  
+external_components:
+  - source: custom_components
+    components: [ i2c ]
+
+#includes:
+#  - GP2Y1010AU0F.h
+
+# Enable logging
+logger:
+#    level: VERY_VERBOSE
+
+# Enable Home Assistant API
+#api:
+#  password: ""
+
+ota:
+  password: ""
+
+wifi:
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Air-Quality-Clock"
+captive_portal:
+
+web_server:
+  port: 80
+
+uart:
+  rx_pin: GPIO16
+  tx_pin: GPIO17
+  baud_rate: 9600
+  
+i2c:
+  sda: GPIO23
+  scl: GPIO19
+  scan: false
+  id: bus_a
+  
+spi:
+  clk_pin: GPIO26
+  mosi_pin: GPIO13
+  
+font:
+  # gfonts://family[@weight]
+  - file: "gfonts://Roboto"
+    id: roboto
+    size: 12
+
+sensor:  
+  - platform: senseair
+    co2:
+      id: co2
+      name: "SenseAir CO2 Value"
+    update_interval: 60s
+  - platform: bme280
+    i2c_id: bus_a
+    temperature:
+      id: bme280_temp
+      name: "BME280 Temperature"
+      oversampling: 16x
+    humidity:
+      id: bme280_hum
+      name: "BME280 Humidity"
+    address: 0x76
+    update_interval: 61s
+  # KS0196 PM2.5 sensor
+  # - platform: custom
+    # lambda: |-
+      # auto dust_sensor = new GP2Y1010AU0F();
+      # App.register_component(dust_sensor);
+      # return {dust_sensor};
+    # sensors:
+      # id: dust_sensor
+      # name: "${device_name} PM2.5 Dust Sensor"
+      # accuracy_decimals: 2
+      # unit_of_measurement: "µg/m³"
+      # icon: "mdi:smog"
+      # filters:
+        # - median: # send every minute the median of the past 5 measurements
+            # window_size: 5
+            # send_every: 5
+            
+time:
+  - platform: sntp
+    id: sntp_time
+
+display:
+  - platform: pcd8544
+    reset_pin: GPIO33
+    cs_pin: GPIO27
+    dc_pin: GPIO25
+    contrast: 0x4f
+    lambda: |-
+      it.strftime(0, 0, id(roboto), "%I:%M:%S %p", id(sntp_time).now());
+      it.printf(0, 16, id(roboto), "CO2: %.0fppm", id(co2).state);
+      it.printf(0, 32, id(roboto), "Temperature: %.0f°C", id(bme280_temp).state);
+      it.printf(0, 48, id(roboto), "Humidity: %.0f%%rh", id(bme280_hum).state);
