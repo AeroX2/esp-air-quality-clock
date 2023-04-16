@@ -3,3 +3,27 @@
 # You can modify this file to suit your needs.
 /.esphome/
 /secrets.yaml
+
+# Ignore compiled binaries
+*.bin
+
+# Ignore compiled object files
+*.pio
+
+# Ignore logs and other runtime data
+*.log
+*.swp
+*.swo
+
+# Ignore sensitive data
+secrets.yaml
+
+# Ignore temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+*.pyzw
+*.DS_Store
