@@ -10,7 +10,7 @@ esphome:
 # retries Wire.endTransmission 5 times before failing.
 external_components:
   - source: custom_components
-    components: [ i2c ]
+    components: [ i2c, pcd8544 ]
 
 #includes:
 #  - GP2Y1010AU0F.h
@@ -74,7 +74,7 @@ sensor:
       id: bme280_hum
       name: "BME280 Humidity"
     address: 0x76
-    update_interval: 61s
+    update_interval: 60s
   # KS0196 PM2.5 sensor
   # - platform: custom
     # lambda: |-
@@ -95,6 +95,7 @@ sensor:
 time:
   - platform: sntp
     id: sntp_time
+    timezone: Australia/Sydney
 
 display:
   - platform: pcd8544
@@ -103,7 +104,7 @@ display:
     dc_pin: GPIO25
     contrast: 0x4f
     lambda: |-
-      it.strftime(12, 4, id(pixelmix_bold), "%H:%M:%S", id(sntp_time).now());
-      it.printf(12, 20, id(pixelmix), "CO2: %.0fppm", id(co2).state);
-      it.printf(16, 28, id(pixelmix), "Temp: %.0f°C", id(bme280_temp).state);
-      it.printf(20, 36, id(pixelmix), "Humi: %.0f%%", id(bme280_hum).state);
+      it.strftime(12, 3, id(pixelmix_bold), "%H:%M:%S", id(sntp_time).now());
+      it.printf(12, 19, id(pixelmix), "CO2: %.0fppm", id(co2).state);
+      it.printf(16, 29, id(pixelmix), "Temp: %.0f°C", id(bme280_temp).state);
+      it.printf(20, 39, id(pixelmix), "Humi: %.0f%%", id(bme280_hum).state);
